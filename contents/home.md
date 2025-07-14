@@ -1,4 +1,4 @@
-[![Thisfat](https://img.shields.io/badge/XX-github-blue?logo=github)](https://github.com/ThisFat)
+[![Thisfat](https://img.shields.io/badge/ThisFat-github-blue?logo=github)](https://github.com/ThisFat)
 
 I'm currently pursuing a Master's degree in Computer Science at the University of Sydney, Sydney.
 
