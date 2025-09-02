@@ -14,4 +14,4 @@ I'm currently pursuing a Master's degree in Computer Science at the University o
 • GPA: 3.47/4.  
 
 #### Research Interests  
-XX, XX, XX, XX.
+LLM, Agent, NLP, Cloud, Computational Geometry, Data Engineering.

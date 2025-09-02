@@ -10,6 +10,23 @@ Worked on the development and optimization of large-scale recommendation systems
 
 ---
 
+### **Agent Development Intern**
+
+**November 2024 – February 2025 | Beijing Zhongchuang Carbon Investment Technology Co., Ltd.**
+
+Built a fully automated “ESG report upload → LLM metric extraction → rule-driven scoring → API callback” pipeline for the China Alcoholic Drinks Association, reducing per-report processing time from 2–3 days to < 1 minute and supporting the first-round quantitative scoring for the industry’s 2025 ESG White Paper.
+
+#### Key Contributions:
+
+* **LLM Metric Extraction:** Designed a few-shot prompt + JSON Schema validation workflow; called Moonshot GPT to extract and parse 102 E/S/G metrics and cleaned them into structured JSON.
+* **Rule-driven Scoring Engine:** Unified extracted results with the business unit’s scoring tables, invoked GPT models to generate scores, and normalized the scoring outputs.
+* **Excel ↔ JSON Bidirectional Mapping Tool:** Implemented a Mapping DSL with Pandas + openpyxl; supported versioning of scoring rules and JSON→Excel write-back to ensure consistent round-tripping.
+* **FastAPI Microservice Design:** Encapsulated business logic and exposed endpoints for backend integration.
+* **Cross-team Data Format Alignment:** Co-defined a data dictionary with ESG researchers (field names, enumerations, missing-value policies) and established version control.
+
+
+---
+
 ### **Agent开发实习生**  
 **2024年11月 – 2025年2月 | 北京中创碳投科技有限公司**  
 
@@ -28,7 +45,21 @@ Worked on the development and optimization of large-scale recommendation systems
 
 ---
 
-### **NLP 系统开发工程师**  
+### **End-to-End NLP Model Comparison & Deployment Project**
+
+**March 2025 – June 2025 | Course Design Project**
+
+Built an end-to-end NLP system for a flight-query scenario covering the full pipeline: “intent & slot recognition → template classification → response generation.” Leveraged PyTorch, HuggingFace Transformers, SentenceTransformers, LangChain, and FAISS to implement 7 models ranging from linear baselines to RAG-LLM, completing training, evaluation, inference, and deployment.
+
+#### Key Contributions:
+
+* **Joint Transformer Model (Slot Tagging + Template Classification):** Designed and implemented a unified pipeline from data preprocessing → training → inference → strict-accuracy evaluation. Built a data processing workflow (variable expansion; generation of “question → SQL template + BIO tags”; unified splits and mappings) to consistently produce best weights and error lists, improving NL→SQL stability and reproducibility.
+* **T5-based NL→SQL Generation Pipeline:** Implemented mixed precision, early stopping, and learning-rate scheduling; paired raw queries with filled, standard SQL to create directly trainable samples; performed strict-match evaluation on the test set and archived the best checkpoint with visualized examples for rapid error localization and experiment reproducibility.
+* **RAG Integration (SentenceTransformers + FAISS + LangChain):** Integrated retrieval-augmented generation to substantially reduce irrelevant/incorrect outputs and improve response controllability in zero-shot settings (≈15–20% improvement based on internal project evaluation).
+
+---
+
+### **NLP 全流程模型对比与部署项目**  
 **2025年3月 – 2025年6月 | 课程设计项目**  
 
 负责构建面向航班查询场景的端到端 NLP 系统，涵盖“意图与槽位识别 → 模板分类 → 回复生成”完整流程。项目采用 PyTorch、HuggingFace Transformers、SentenceTransformers、LangChain 与 FAISS，覆盖从线性基线到 RAG-LLM 的 7 种模型，完成训练、评测、推理及部署。
@@ -40,80 +71,20 @@ Worked on the development and optimization of large-scale recommendation systems
 
 - 集成 SentenceTransformers + FAISS 与 LangChain 的检索增强生成（RAG），在零样本场景显著降低无关/错误生成比例并提升回答可控性（基于项目内部评测，约 15–20%）。
 
-> [!NOTE]
-> 下面各用**一个小例子**把两条模型线（T5 生成式；“槽位标注 + 模板分类”联合模型）讲清楚：做什么、怎么做、最后怎样评测。
-> 
-> ---
-> 
-> #### 例子1：T5 生成式 NL→SQL
-> 
-> **用户问句（已替换好变量）：**
-> “查询 **2025-09-03** 上午 从 **北京** 到 **上海** 的航班编号。”
-> 
-> **怎么做（generation\_transformer\_model/predict）：**
-> 
-> 1. `cus_dataset.Seq2SQLDataset` 生成训练样本：
-> 
->    * 输入文本：上面整句；
->    * 目标文本（Gold SQL）：
-> 
->    ```sql
->    SELECT flight_id FROM flights
->    WHERE from_city='Beijing' AND to_city='Shanghai'
->      AND flight_date='2025-09-03' AND dep_period='morning';
->    ```
-> 
->    * T5 分词后：输入→`input_ids`，目标→`labels`（PAD 用 -100 屏蔽）。
-> 2. 训练时 T5 用 teacher forcing 预测下一 token，按交叉熵最小化。
-> 3. 推理时 `model.generate(...)` 直接“从问句生成 SQL”。
-> 
-> **输出与评测（strict-match）：**
-> 
-> * 预测 SQL（Pred）：
-> 
->   ```sql
->   select flight_id from flights where from_city='Beijing' and to_city='Shanghai' 
->     and flight_date='2025-09-03' and dep_period='morning';
->   ```
-> * 与 Gold **逐字符比**：完全一致→计正确；大小写/空格/分号不同也会判错（这就是 strict-match 的苛刻点）。
-> 
-> ---
-> 
-> #### 例子2：联合模型（槽位序列标注 + 模板分类）
-> 
-> **用户问句（含槽位）：**
-> “帮我查 **明天** 上午 从 **北京** 到 **上海** 的**航班数量**。”
-> 
-> **怎么做（classificaion\_transformer\_model/predict）：**
-> 
-> 1. **模板分类**：模型读整句语义，挑选最匹配模板，例如：
-> 
->    ```
->    TPL_COUNT: 
->    SELECT COUNT(*) FROM flights 
->    WHERE from_city=:from_city AND to_city=:to_city 
->      AND flight_date=:date AND dep_period=:part_of_day;
->    ```
-> 2. **槽位标注（BIO）**：对每个 token 贴标签并抽取值：
-> 
->    ```
->    句子:   明天  上午  从  北京  到  上海  的  航班  数量
->    标签:   B-date B-part O   B-from I-from O  O   O     O
->    抽槽:   date=明天, part_of_day=上午, from_city=北京, to_city=上海
->    ```
-> 3. **填槽生成 SQL**：把上面的值替到模板占位符：
-> 
->    ```sql
->    SELECT COUNT(*) FROM flights
->    WHERE from_city='Beijing' AND to_city='Shanghai'
->      AND flight_date='2025-09-03' AND dep_period='morning';
->    ```
-> 
->    （实际系统里，“明天/上午”会在预处理里归一化成日期与时段。）
-> 
-> **输出与评测（严格准确率）：**
-> 
-> * 只有当“模板判对”**且**“所有有效 token 的槽位标签全对”时，这条样本才计为**严格正确**；任一环节错则判错，有助于定位是**选错模板**还是**抽槽出错**。
+---
+
+### **AWS Serverless Image Upload & Auto-Captioning System**
+
+**March 2025 – June 2025 | Course Design Project**
+
+Implemented an end-to-end serverless pipeline on AWS—“image upload → automatic thumbnail generation → caption creation → frontend display”—so each upload immediately yields display-ready content. Adopted least-privilege and layered-security design with elasticity and observability (ALB/ASG, S3, Lambda, RDS, Secrets Manager, CloudWatch).
+
+#### Key Contributions:
+
+* **Serverless Event Chain Delivery:** Designed an S3 → EventBridge → Lambda “upload-to-process” flow. New objects under `uploads/` trigger two branches (Annotation and Thumbnail) to auto-generate captions and 128×128 thumbnails, then write back to storage/database.
+* **AI Capability & Secret Governance:** `AnnotationFunction` reads the original image and invokes Google Gemini to generate captions; `(image key, caption)` is persisted to RDS. Gemini/RDS credentials are centralized in Secrets Manager and injected at runtime to avoid plaintext and hardcoding.
+* **Elasticity & High Availability Engineering:** Configured ASG desired capacity and scaling, with \~60% CPU as the threshold for scale-out/in; ALB distributes traffic across AZs; VPC public/private subnets plus NAT/Bastion secure egress and operations.
+* **Performance & Elasticity Validation:** Used ApacheBench to stress `/upload` with 20 concurrent × 500 requests—100% success, \~41 ms average latency, 484 req/s throughput; CloudWatch metrics showed CPU spikes and recovery, validating ALB distribution and ASG autoscaling.
 
 ---
 
