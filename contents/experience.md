@@ -65,9 +65,9 @@ Built an end-to-end NLP system for a flight-query scenario covering the full pip
 负责构建面向航班查询场景的端到端 NLP 系统，涵盖“意图与槽位识别 → 模板分类 → 回复生成”完整流程。项目采用 PyTorch、HuggingFace Transformers、SentenceTransformers、LangChain 与 FAISS，覆盖从线性基线到 RAG-LLM 的 7 种模型，完成训练、评测、推理及部署。
 
 #### 主要贡献:  
-- 设计并实现基于 Transformer 的联合学习模型（槽位序列标注 + 模板分类），打通数据预处理→训练→推理→严格准确率评测的一体化链路；同时搭建数据加工流水线（变量展开、生成“问题→SQL 模板 + BIO 标签”、统一切分与映射），稳定产出最优权重与误差清单，提升 NL→SQL 的稳定性与可复现性。
+- 设计并实现基于 Transformer 的联合学习模型（槽位序列标注 + 模板分类），并在领域语料上微调主干模型（BERT/RoBERTa）；打通数据预处理→训练→推理→严格准确率评测的一体化链路，稳定产出最优权重与误差清单，提升 NL→SQL 的稳定性与可复现性。
 
-- 构建以 T5 为核心的 NL→SQL 生成流水线（混合精度、早停与学习率调度），并将原始问句与已填值标准 SQL自动配对为可直接训练的样本，在测试集完成 strict-match 评测并沉淀最优 checkpoint + 可视化样例，支持快速定位错误与复现实验。
+- 构建以 T5 为核心的 NL→SQL 生成流水线，在项目语料上微调 T5-base（混合精度训练、早停与 ReduceLROnPlateau 调度），于测试集进行 strict-match 准确率评测，并沉淀最优 checkpoint 与可视化样例用于快速定位错误与回归验证。
 
 - 集成 SentenceTransformers + FAISS 与 LangChain 的检索增强生成（RAG），在零样本场景显著降低无关/错误生成比例并提升回答可控性（基于项目内部评测，约 15–20%）。
 
