@@ -1,3 +1,1 @@
-- 校级一等奖学金, 2022.  
-
-- Outstanding Graduation Thesis, XXX University, 2023. 
+- The Third Prize in the 10th National College Students Digital Media Technology Works and Creative Competition in 2022. 
